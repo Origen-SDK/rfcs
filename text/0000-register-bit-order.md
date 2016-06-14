@@ -18,11 +18,6 @@ we found the bit-order format of many registers is the reverse of the Origen mod
 This prevents us from using the full capability of the register model, in accessing
 values in bit collections or individual bit values after writing known hex values.
 
-Example of reverse bit-order register:
-	myreg.write(0x0001)
-	myreg[0].data # => 1
-	myreg[31].data  # => 0
-	
 # Detailed design
 
 It is desired to assign a bit order property when declaring the register.
@@ -30,6 +25,8 @@ Here is an example of a declaration of a PPC formated register in Origen (using
 reverse bit ordering).....with bit_order property passed in reg (optional) to 
 tell Origen to use reverse bit ordering for this register.
 
+Example of reverse bit-order register declaration:
+~~~ruby
 reg :SIUL2_MIDR1, 0x4, size: 32, bit_order: reverse do |reg|
 	bit 0..15,  :PARTNUM, res:0b0101011101110111, access: :ro
 	bit 16,		:ED
@@ -38,12 +35,13 @@ reg :SIUL2_MIDR1, 0x4, size: 32, bit_order: reverse do |reg|
 	bit	24..27  :MAJOR_MASK
 	bit 28..31	:MINOR_MASK
 end
-
-Example of reverse bit-order register:
+~~~
+Example of reverse bit-order register access:
+~~~ruby
 	myreg.write(0x0001)
-	myreg[0].data # => 1
-	myreg[31].data  # => 0
-
+	myreg[0].data # => 0
+	myreg[31].data  # => 1
+~~~~
 # How We Teach This
 
 A small addition to the register guide could easily explain the option to
@@ -64,6 +62,8 @@ proposal fits in with CRR and how they plan to represent PPC formatted registers
 
 So far, the only alternative is to force the data in the register to be reversed
 after writing, so that register reads produce the correct data by bit index.
+However, when printing the register to the screen, this workaround does not
+allow the register to display from MSB to LSB (bit 0 to bit 31) as desired.
 
 # Unresolved questions
 
