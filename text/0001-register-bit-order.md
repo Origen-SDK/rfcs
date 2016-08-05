@@ -1,6 +1,6 @@
-- Start Date: (1016-06-13)
-- RFC PR: ()
-- Origen Issue: ()
+- Start Date: 2016-08-05
+- RFC PR: https://github.com/Origen-SDK/rfcs/pull/1
+- Origen Issue: 
 
 # Summary
 
