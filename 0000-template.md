@@ -19,19 +19,6 @@ implementation to implement. This should get into specifics and corner-cases,
 and include examples of how the feature is used. Any new terminology should be
 defined here.
 
-# How We Teach This
-
-What names and terminology work best for these concepts and why? How is this
-idea best presented? As a continuation of existing Origen patterns, or as a
-wholly new one?
-
-Would the acceptance of this proposal mean the Origen guides must be
-re-organized or altered? Does it change how Origen is taught to new users
-at any level?
-
-How should this feature be introduced and taught to existing Origen
-users?
-
 # Drawbacks
 
 Why should we *not* do this? Please consider the impact on teaching Origen,
@@ -39,10 +26,6 @@ on the integration of this feature with other existing and planned features,
 on the impact of the API churn on existing apps, etc.
 
 There are tradeoffs to choosing any path, please attempt to identify them here.
-
-# Alternatives
-
-What other designs have been considered? What is the impact of not doing this?
 
 # Unresolved questions
 
