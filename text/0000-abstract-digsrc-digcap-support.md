@@ -45,52 +45,34 @@ The returned hash would contain information like:
   -pin drive state subsequent cycles (.repeat_previous for overlay or .drive_mem for digsrc)
   
   
-#################################################
-# example app code
-#################################################
-
-App code would look something like this:
-tester.instrument_setting(dut.pin(:tdi), bit_width: 12)
-dut.reg(:my_reg).bit(:TM).overlay("override_testmode")
-dut.reg(:my_reg).bit(:other_bit).write(0)!
-
-#################################################
-# example protocol driver code
-#################################################
-
-Protocol driver (JTAG example) would look something like this:
-if bit.has_overlay?
-  # in this example the protocol knows it is performing a serial shift, lsb first and defaults to bit_width 1
-  # the app code doesn't need to know anything about the protocol used when write! is called
-  what_do_i_do_hash = tester.format_overlay(dut.pin(:tdi), bit.overlay_str, serial: true, lsb_first: true, bit_width: 1)
-  
-  #
-  # implement the shifting of this bit in a way that allows vector modify OR digsrc to work:
-  #
-  
-  # push the returned digsrc microcode OR the returned formatted overlay string
-  tester.push_microcode(what_do_i_do_hash[:required_microcode]) if what_do_i_do_hash.key?(:microcode_required)
-  
-  # on the first tester cycle with this bit write out "D" if digsrc or the bit data if using vector modify
-  tester.dont_compress = true
-  if what_do_i_do_hash[:state_first_cycle] = :drive_mem
-    dut.pin(:tdi).drive_mem
-  else
-    dut.pin(:tdi).drive(bit.value)
-  end
-  
-  ....
-  
-  # this isn't how the driver works, but for follow on cycles (if clock ratio > 1)
-  # advance to next cycle
-  tester.cycle
-  
-  ....
-  # then re-enable compression
-  # and insert the follow on character "D" for digsrc, "-" for vector modify
-  tester.dont_compress = false
-  dut.pin(:tdi).repeat_previous unless what_do_i_do_hash[:state_second_cycle] = :drive_mem
+~~~ruby
+def app_code_example
+  tester.instrument_setting(dut.pin(:tdi), bit_width: 12)
+  dut.reg(:my_reg).bit(:TM).overlay("override_testmode")
+  dut.reg(:my_reg).bit(:other_bit).write!(0)
 end
+~~~
+
+~~~ruby
+def protocol_driver_jtag_example
+  if bit.has_overlay?
+    what_do_i_do_hash = tester.format_overlay(dut.pin(:tdi), bit.overlay_str, serial: true, lsb_first: true, bit_width: 1)
+    tester.push_microcode(what_do_i_do_hash[:required_microcode]) if what_do_i_do_hash.key?(:required_microcode)
+  
+    tester.dont_compress = true
+    if what_do_i_do_hash[:state_first_cycle] = :drive_mem
+      dut.pin(:tdi).drive_mem
+    else
+      dut.pin(:tdi).drive(bit.value)
+    end
+  
+    tester.cycle
+  
+    tester.dont_compress = false
+    dut.pin(:tdi).repeat_previous unless what_do_i_do_hash[:state_second_cycle] = :drive_mem
+  end
+end
+~~~
 
 
 
@@ -121,6 +103,7 @@ Testers plug-in for UFlex will require an update to implement digsrc/cap specifi
 # Unresolved questions
 
 -Need a way to select digsrc or MTO on UFlex?
+-Still need a way to get the digsrc start microcode entered 144 cycles before and send microcode
 -Need to provide the app or pattern source a way to specify some settings (like
 the width of the digsrc or digcap).  Maybe something like:
 tester.instrument_setting(dut.pin(:blah), bit_width: 12)
