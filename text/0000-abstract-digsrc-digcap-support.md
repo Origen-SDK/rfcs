@@ -32,6 +32,14 @@ store_to_mem:
 Read/Write attribute.  The equivalent of overlay_from_mem except it enables
 digcap.
 
+instrument_setting:
+Method for accumulating instrument settings for given pins.  Default behavior
+defined in VectorGenerator would be to perform no action.  The Uflex tester
+object would be updated to accumulate pins and settings for instrument statement
+generation.  This method could be used for more than JUST digsrc/cap.  I could
+see our group also using this as the instruement header equivalent of "push_microcode".
+
+
 format_overlay(dut.pin(:blah), bit.overlay_str, options_hash={}):
 Method to create tester specific collateral for overlay (similar to format_pin_state).  Returns a hash with info
 for the protocol driver to use in implementing the overlay (or digsrc).  The UFlex
@@ -79,7 +87,9 @@ end
 tester.store():
 This method would also need an update for UFlex to capture the additional instrument options.
 The protocol driver would be updated to do this (JTAG example):
+~~~ruby
 tester.store!(dut.pin(:tdo), serial: true, lsb_first: true, bit_width: 1)
+~~~
 
 
 The idea here is that the app has the option (not responsibility) to specify some or all of the 
@@ -103,7 +113,7 @@ Testers plug-in for UFlex will require an update to implement digsrc/cap specifi
 # Unresolved questions
 
 -Need a way to select digsrc or MTO on UFlex?
--Still need a way to get the digsrc start microcode entered 144 cycles before and send microcode
+-Still need a way to get the digsrc start microcode entered 144 cycles before any send microcode
 -Need to provide the app or pattern source a way to specify some settings (like
 the width of the digsrc or digcap).  Maybe something like:
 tester.instrument_setting(dut.pin(:blah), bit_width: 12)
