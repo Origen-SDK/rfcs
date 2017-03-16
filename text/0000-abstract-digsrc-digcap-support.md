@@ -82,6 +82,7 @@ def protocol_driver_jtag_example
 end
 ~~~
 
+~~~
 ------------------------------------------------------------------------------
 Pattern with digsrc (pattern allowed default width of 1 to be used):
 ------------------------------------------------------------------------------
@@ -102,6 +103,7 @@ repeat 40       > tp0   100DLXXX ;
 ------------------------------------------------------------------------------
 end of pattern with digsrc
 ------------------------------------------------------------------------------
+~~~
 
 
 																 
@@ -113,6 +115,7 @@ The protocol driver would be updated to do this (JTAG example):
 tester.store!(dut.pin(:tdo), serial: true, lsb_first: true, bit_width: 1)
 ~~~
 
+~~~
 ------------------------------------------------------------------------------
 Pattern with digcap (might want 2 digcap instruments with different settings):
   Pattern selected bit width of 32 for spi_miso instead of default of 1
@@ -137,6 +140,7 @@ repeat 39       > tp0   1000XXXX ;
 ------------------------------------------------------------------------------
 end of pattern with digcap
 ------------------------------------------------------------------------------
+~~~
 
 
 
