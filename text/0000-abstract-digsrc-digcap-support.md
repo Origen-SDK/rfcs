@@ -83,18 +83,18 @@ end
 ~~~
 
 ------------------------------------------------------------------------------
-Pattern with digsrc:
+Pattern with digsrc (pattern allowed default width of 1 to be used):
 ------------------------------------------------------------------------------
 instruments = {
         (spimosi):DigSrc 1;
 }
 ...
-// here comes a bit
+-- here comes a bit
 ((spimosi):DigSrc = SEND)                                                                       
                 > tp0   000DXXXX ;
 repeat 39       > tp0   000DXXXX ;
 repeat 40       > tp0   100DLXXX ;
-// here comes the next bit
+-- here comes the next bit
 ((spimosi):DigSrc = SEND)                                                                       
                 > tp0   000DXXXX ;
 repeat 39       > tp0   000DXXXX ;
@@ -115,6 +115,7 @@ tester.store!(dut.pin(:tdo), serial: true, lsb_first: true, bit_width: 1)
 
 ------------------------------------------------------------------------------
 Pattern with digcap (might want 2 digcap instruments with different settings):
+  Pattern selected bit width of 32 for spi_miso instead of default of 1
 ------------------------------------------------------------------------------
 instruments = {
         (ADC_CAPTURE_15B):DigCap 15:data_type=long:auto_trig_enable;
@@ -122,12 +123,12 @@ instruments = {
         (spi_miso):DigCap 32:lsb:serial:data_type=long:auto_trig_enable;
 }
 ...
-// here comes a bit to store
+-- here comes a bit to store (this is a SPI shift, capturing the last cycle of an 80 cycle period)
 repeat 40       > tp0   0000XXXX ;
 repeat 39       > tp0   1000XXXX ;
 ((spi_miso):DigCap = Store)                                                                     
                 > tp0   1000VXXX ;
-// here comes another bit to store
+-- here comes another bit to store
 repeat 40       > tp0   0000XXXX ;
 repeat 39       > tp0   1000XXXX ;
 ((spi_miso):DigCap = Store)                                                                     
