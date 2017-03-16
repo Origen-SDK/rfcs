@@ -37,7 +37,7 @@ Method for accumulating instrument settings for given pins.  Default behavior
 defined in VectorGenerator would be to perform no action.  The Uflex tester
 object would be updated to accumulate pins and settings for instrument statement
 generation.  This method could be used for more than JUST digsrc/cap.  I could
-see our group also using this as the instruement header equivalent of "push_microcode".
+see our group also using this as the instrument header equivalent of "push_microcode".
 
 
 format_overlay(dut.pin(:blah), bit.overlay_str, options_hash={}):
@@ -82,7 +82,29 @@ def protocol_driver_jtag_example
 end
 ~~~
 
+------------------------------------------------------------------------------
+Pattern with digsrc:
+------------------------------------------------------------------------------
+instruments = {
+        (spimosi):DigSrc 1;
+}
+...
+// here comes a bit
+((spimosi):DigSrc = SEND)                                                                       
+                > tp0   000DXXXX ;
+repeat 39       > tp0   000DXXXX ;
+repeat 40       > tp0   100DLXXX ;
+// here comes the next bit
+((spimosi):DigSrc = SEND)                                                                       
+                > tp0   000DXXXX ;
+repeat 39       > tp0   000DXXXX ;
+repeat 40       > tp0   100DLXXX ;
+------------------------------------------------------------------------------
+end of pattern with digsrc
+------------------------------------------------------------------------------
 
+
+																 
 
 tester.store():
 This method would also need an update for UFlex to capture the additional instrument options.
@@ -90,6 +112,31 @@ The protocol driver would be updated to do this (JTAG example):
 ~~~ruby
 tester.store!(dut.pin(:tdo), serial: true, lsb_first: true, bit_width: 1)
 ~~~
+
+------------------------------------------------------------------------------
+Pattern with digcap (might want 2 digcap instruments with different settings):
+------------------------------------------------------------------------------
+instruments = {
+        (ADC_CAPTURE_15B):DigCap 15:data_type=long:auto_trig_enable;
+        SAR_IN_2:UltraSource;
+        (spi_miso):DigCap 32:lsb:serial:data_type=long:auto_trig_enable;
+}
+...
+// here comes a bit to store
+repeat 40       > tp0   0000XXXX ;
+repeat 39       > tp0   1000XXXX ;
+((spi_miso):DigCap = Store)                                                                     
+                > tp0   1000VXXX ;
+// here comes another bit to store
+repeat 40       > tp0   0000XXXX ;
+repeat 39       > tp0   1000XXXX ;
+((spi_miso):DigCap = Store)                                                                     
+                > tp0   1000VXXX ;
+
+------------------------------------------------------------------------------
+end of pattern with digcap
+------------------------------------------------------------------------------
+
 
 
 The idea here is that the app has the option (not responsibility) to specify some or all of the 
