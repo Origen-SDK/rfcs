@@ -32,12 +32,14 @@ Attribute used to control the type of overlay (need MTO support?  Don't know how
 ~~~
 
 
+
 tester.capture_style:
 Attribute used to control the type of capture memory used (need MTO support?).
 ~~~ruby
   tester.capture_style = :digcap
   tester.capture_style = :hram		# or some other descriptive name
 ~~~
+
 
 tester.overlay:
 Method for implementing the tester specific overlay.  The app will have the option
