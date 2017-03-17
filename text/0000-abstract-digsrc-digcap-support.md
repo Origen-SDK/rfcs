@@ -23,7 +23,7 @@ of support we would require custom drivers along with other stop gap solutions.
 
 # Detailed design
 
-tester.overlay_style:
+- tester.overlay_style:
 Attribute used to control the type of overlay (need MTO support?  Don't know how it's used):
 ~~~ruby
   tester.overlay_style = :subroutine
@@ -33,7 +33,7 @@ Attribute used to control the type of overlay (need MTO support?  Don't know how
 
 
 
-tester.capture_style:
+- tester.capture_style:
 Attribute used to control the type of capture memory used (need MTO support?).
 ~~~ruby
   tester.capture_style = :digcap
@@ -41,7 +41,7 @@ Attribute used to control the type of capture memory used (need MTO support?).
 ~~~
 
 
-tester.overlay:
+- tester.overlay:
 Method for implementing the tester specific overlay.  The app will have the option
 of selecting a non-default overlay type using tester.overlay_style.  The protocol
 driver would use this method when overlay is requested:
@@ -58,7 +58,7 @@ digsrc START microcode (at the beginning of the pattern is fine) if it hasn't al
 been inserted.
 
 
-tester.source_memory:
+- tester.source_memory:
 Method for configuring the source memory to non-default values.  This will be used
 to render the instruments statement on the UFlex:
 ~~~ruby
@@ -68,7 +68,7 @@ to render the instruments statement on the UFlex:
 ~~~
 
 
-tester.capture_memory:
+- tester.capture_memory:
 Method for configuring the capture memory to non-default values.  This will be used
 to render the instruments statement on the UFlex:
 ~~~ruby
@@ -110,7 +110,7 @@ end of pattern with digsrc
 
 																 
 
-tester.store():
+- tester.store():
 This method would also need an update for UFlex to handle digcap or HRAM (or MTO?).
 
 ~~~
