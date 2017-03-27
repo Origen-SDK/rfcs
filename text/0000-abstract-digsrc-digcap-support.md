@@ -126,7 +126,7 @@ end of pattern with digsrc
 																 
 
 - tester.store():
-This method would also need an update for UFlex to handle digcap or HRAM (or MTO?).
+This method would also need an update for UFlex to handle digcap, HRAM or MTO.
 
 ~~~
 ------------------------------------------------------------------------------
