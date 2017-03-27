@@ -24,20 +24,22 @@ of support we would require custom drivers along with other stop gap solutions.
 # Detailed design
 
 - tester.overlay_style:
-Attribute used to control the type of overlay (need MTO support?  Don't know how it's used):
+Attribute used to control the type of overlay:
 ~~~ruby
   tester.overlay_style = :subroutine
   tester.overlay_style = :label
   tester.overlay_style = :digsrc
+  tester.overlay_style = :mto
 ~~~
 
 
 
 - tester.capture_style:
-Attribute used to control the type of capture memory used (need MTO support?).
+Attribute used to control the type of capture memory used.
 ~~~ruby
   tester.capture_style = :digcap
   tester.capture_style = :hram		# or some other descriptive name
+  tester.capture_style = :mto
 ~~~
 
 
@@ -51,6 +53,11 @@ driver would use this method when overlay is requested:
   if reg_or_val[i].has_overlay?
     options[:pins] = dut.pin(:tdi)	# Tell the tester which pins to overlay
 	tester.overlay reg_or_val[i].overlay_str, options
+	# ...
+	# Same data, but need it on multiple cycles
+	tester.cycle
+	options[:change_data] = false
+	tester.overlay reg_or_val[i].overlay_str, options
   end
 ~~~
 For the UFlex digsrc, this method should insert the digsrc SEND microcode and the
@@ -60,10 +67,16 @@ been inserted.
 
 - tester.source_memory:
 Method for configuring the source memory to non-default values.  This will be used
-to render the instruments statement on the UFlex:
+to render the instruments statement on the UFlex.  Need the ability to independently
+configure pin/source memory:
 ~~~ruby
-  tester.source_memory do |mem|
+  tester.source_memory :digsrc do |mem|
     mem.pin :tdi, size:32
+  end
+  
+  # If no mem ID given, populate :default configuration:
+  tester.source_memory :default do |mem|
+    mem.pin :tdi, size: 32
   end
 ~~~
 
@@ -72,10 +85,12 @@ to render the instruments statement on the UFlex:
 Method for configuring the capture memory to non-default values.  This will be used
 to render the instruments statement on the UFlex:
 ~~~ruby
-  tester.capture_memory do |mem|
+  tester.capture_memory :digcap do |mem|
     mem.pin :tdo, size: 8, bit_order: :msb0		# LSB first should be default to align with register default
 	mem.pin :blah	# ...
   end
+  
+  # same fall back :default mechanism as tester.source_memory if no mem ID provided
 ~~~
 
 
@@ -158,7 +173,3 @@ Testers plug-in for UFlex and 93K will require an update to implement digsrc/cap
 
 
 # Unresolved questions
-
-Need a way to select digsrc or MTO on UFlex (or MTO on the J750 for that matter)?
-
-tester.overlay will need to be able to handle a drive bit being spread across multiple cycles.
