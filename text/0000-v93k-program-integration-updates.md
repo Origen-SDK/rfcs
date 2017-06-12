@@ -47,14 +47,64 @@ outside of origen_testers but API permits query.
 
 Allow to pass in port name would like to be used so it can be included in pattern compile AIV file.
 
-#### Other features added here as result of ongoing RFC discussion...
-
 ### Limits File object
 
 Addition of limits file class, similar to variables_file class.   Test methods add the limits they
 require to an instantion of this class.
 
 Later upon program sheet generation, the limits file is generated via a template.
+
+### Result
+
+Upon setting `tester.create_limits_file = true`, a CSV limits file is generated and placed in a subdirectory called `testtable/limits`. Per current program modularity convention, each sub-module will have a CSV file in this directory.  Each test flow will then reference a limits MFH file that calls the CSV files.
+
+E.g. Limits MFH:
+
+~~~
+hp93000,testtable_master_file,0.1
+
+testerfile limits/group_submodule1_limits.csv
+testerfile limits/group_submodule2_limits.csv
+testerfile limits/group_submodule3_limits.csv`
+~~~
+
+The format of the CSV is as follows:
+~~~
+"Suite Name","Pins","Test name","Test number","Lsl","Lsl_typ","Usl_typ","Usl","Units","Bin_s_num","Bin_s_name","Bin_h_num","Bin_h_name","Bin_type","Bin_reprobe","Bin_overon","Test_remarks"
+"test1","","               ","1 ","1    ","GE","LE","1    ","","10","","3","","","",""
+"test2","","test2_seqlbl   ","2 ","1    ","GE","LE","1    ","","10","","3","","","",""
+"test3","","test3_seqlbl   ","3 ","1    ","GE","LE","1    ","","10","","3","","","",""
+"test4","","test4_seqlbl   ","4 ","1    ","GE","LE","1    ","","10","","3","","","",""
+"test4","","test4_labelname","5 ","1.55 ","GE","LE","1.65 ","","10","","3","","","",""
+"test5","","test5_seqlbl   ","6 ","1    ","GE","LE","1    ","","10","","3","","","",""
+"test5","","test5_labelname","7 ","1.375","GE","LE","1.525","","10","","3","","","",""
+"test6","","test6_seqlbl   ","8 ","1    ","GE","LE","1    ","","10","","3","","","",""
+"test6","","test6_labelname","9 ","4.5  ","GE","LE","5.5  ","","10","","3","","","",""
+"test7","","test7_seqlbl   ","10","1    ","GE","LE","1    ","","10","","3","","","",""
+"test7","","test7_labelname","11","1    ","GE","LE","1    ","","10","","3","","","",""
+~~~
+
+Here it is again in tabular form for clarity:
+
+|Suite Name|Pins|Test name|Test number|Lsl|Lsl_typ|Usl_typ|Usl|Units|Bin_s_num|Bin_s_name|Bin_h_num|Bint_type|Bin_reprobe|Bin_overon|Test_remarks|
+|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
+|test2||test2_seqlbl   |2 |1    |GE|LE|1    ||10||3|
+|test3||test3_seqlbl   |3 |1    |GE|LE|1    ||10||3|
+|test4||test4_seqlbl   |4 |1    |GE|LE|1    ||10||3|
+|test4||test4_labelname|5 |1.55 |GE|LE|1.65 ||10||3|
+|test5||test5_seqlbl   |6 |1    |GE|LE|1    ||10||3|
+|test5||test5_labelname|7 |1.375|GE|LE|1.525||10||3|
+|test6||test6_seqlbl   |8 |1    |GE|LE|1    ||10||3|
+|test6||test6_labelname|9 |4.5  |GE|LE|5.5  ||10||3|
+|test7||test7_seqlbl   |10|1    |GE|LE|1    ||10||3|
+|test7||test7_labelname|11|1    |GE|LE|1    ||10||3|
+
+
+
+
+
+
+NOTE that functional tests require LSL/USL limit set to GE/LE a value of 1.   Parametric tests require in addition the parametric test limits desired.
 
 # Drawbacks
 
