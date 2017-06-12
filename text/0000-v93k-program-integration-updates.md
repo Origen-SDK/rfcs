@@ -70,34 +70,35 @@ testerfile limits/group_submodule3_limits.csv`
 
 The format of the CSV is as follows:
 ~~~
-"Suite Name","Pins","Test name","Test number","Lsl","Lsl_typ","Usl_typ","Usl","Units","Bin_s_num","Bin_s_name","Bin_h_num","Bin_h_name","Bin_type","Bin_reprobe","Bin_overon","Test_remarks"
-"test1","","               ","1 ","1    ","GE","LE","1    ","","10","","3","","","",""
-"test2","","test2_seqlbl   ","2 ","1    ","GE","LE","1    ","","10","","3","","","",""
-"test3","","test3_seqlbl   ","3 ","1    ","GE","LE","1    ","","10","","3","","","",""
-"test4","","test4_seqlbl   ","4 ","1    ","GE","LE","1    ","","10","","3","","","",""
-"test4","","test4_labelname","5 ","1.55 ","GE","LE","1.65 ","","10","","3","","","",""
-"test5","","test5_seqlbl   ","6 ","1    ","GE","LE","1    ","","10","","3","","","",""
-"test5","","test5_labelname","7 ","1.375","GE","LE","1.525","","10","","3","","","",""
-"test6","","test6_seqlbl   ","8 ","1    ","GE","LE","1    ","","10","","3","","","",""
-"test6","","test6_labelname","9 ","4.5  ","GE","LE","5.5  ","","10","","3","","","",""
-"test7","","test7_seqlbl   ","10","1    ","GE","LE","1    ","","10","","3","","","",""
-"test7","","test7_labelname","11","1    ","GE","LE","1    ","","10","","3","","","",""
+"Suite name","Pins","Test name","Test number","Lsl","Lsl_typ","Usl_typ","Usl","Units","Bin_s_num","Bin_s_name","Bin_h_num","Bin_h_name","Bin_type","Bin_reprobe","Bin_overon","Test_remarks"
+"test1","","","1","1","GE","LE","1","","10","","3","","","","",""
+"test2","","test2_seqlbl","2","1","GE","LE","1","","10","","3","","","","",""
+"test3","","test3_seqlbl","3","1","GE","LE","1","","10","","3","","","","",""
+"test4","","test4_seqlbl","4","1","GE","LE","1","","10","","3","","","","",""
+"test4","pin1","test4_labelname","5","1.55","GE","LE","1.65","","10","","3","","","","",""
+"test5","","test5_seqlbl","6","1","GE","LE","1","","10","","3","","","","",""
+"test5","pin1","test5_labelname","7","1.375","GE","LE","1.525","","10","","3","","","","",""
+"test6","","test6_seqlbl","8","1","GE","LE","1","","10","","3","","","","",""
+"test6","pin1","test6_labelname","9","4.5","GE","LE","5.5","","10","","3","","","","",""
+"test7","","test7_seqlbl","10","1","GE","LE","1","","10","","3","","","","",""
+"test7","pin1","test7_labelname","11","1","GE","LE","1","","10","","3","","","","",""
 ~~~
 
 Here it is again in tabular form for clarity:
 
-|Suite Name|Pins|Test name|Test number|Lsl|Lsl_typ|Usl_typ|Usl|Units|Bin_s_num|Bin_s_name|Bin_h_num|Bint_type|Bin_reprobe|Bin_overon|Test_remarks|
-|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
+|Suite name|Pins|Test name|Test number|Lsl|Lsl_typ|Usl_typ|Usl|Units|Bin_s_num|Bin_s_name|Bin_h_num|Bin_h_name|Bin_type|Bin_reprobe|Bin_overon|Test_remarks|
+|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|--|
+|test1|||1 |1    |GE|LE|1    ||10||3|
 |test2||test2_seqlbl   |2 |1    |GE|LE|1    ||10||3|
 |test3||test3_seqlbl   |3 |1    |GE|LE|1    ||10||3|
-|test4||test4_seqlbl   |4 |1    |GE|LE|1    ||10||3|
-|test4||test4_labelname|5 |1.55 |GE|LE|1.65 ||10||3|
+|test4||test4_seqlbl   |4 |1    |GE|LE|2    ||10||3|
+|test4|pin1|test4_labelname|5 |1.55 |GE|LE|1.65 ||10||3|
 |test5||test5_seqlbl   |6 |1    |GE|LE|1    ||10||3|
-|test5||test5_labelname|7 |1.375|GE|LE|1.525||10||3|
+|test5|pin1|test5_labelname|7 |1.375|GE|LE|1.525||10||3|
 |test6||test6_seqlbl   |8 |1    |GE|LE|1    ||10||3|
-|test6||test6_labelname|9 |4.5  |GE|LE|5.5  ||10||3|
+|test6|pin1|test6_labelname|9 |4.5  |GE|LE|5.5  ||10||3|
 |test7||test7_seqlbl   |10|1    |GE|LE|1    ||10||3|
-|test7||test7_labelname|11|1    |GE|LE|1    ||10||3|
+|test7|pin1|test7_labelname|11|1    |GE|LE|1    ||10||3|
 
 
 
