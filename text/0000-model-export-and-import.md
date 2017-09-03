@@ -50,8 +50,8 @@ The corresponding `import` method will take the same name argument.
 Models will be able to call the `import` method multiple times to load model data from different sources.
 
 ```ruby
-# Importers, like those provided by CrossOrigen, should build up a model from the data it is importing, it
-# would then call export on that model:
+# All importers, like those provided by CrossOrigen, should build up a model from the data it is importing
+# and then call export on that model at the end:
 imported_model.export('device_1_pin_data')
 
 # The application model can then call import during initialization:
@@ -61,13 +61,15 @@ module MyApp
     
     def initialize(options = {})
       import 'device_1_pin_data'
-      import 'device_1_registers'
+      import 'device_1_registers_from_xml'
+      import 'device_1_test_registers'
     end
   end
 end
 ```
 
-### File Structure
+It is possible that multiple import may contain references to the same sub-block(s), e.g. one might contain the user registers for a given sub-block(s) and another might define the test registers for them.
+The import method must be designed to be aware of and handle this case.
 
 ### Lazy Loading Sub-blocks
 
@@ -98,10 +100,75 @@ class SubBlockPlaceholder
   # current sub_block definition method does, and will replace the placeholder object with the
   # created sub_block
   def materialize
-    owner.instantiate_sub_block(@name, @attributes)
+    # Create the sub_block on the owner object here
   end
 end  
 ~~~
+
+For reference, here is the placeholder class used for registers: https://github.com/Origen-SDK/origen/blob/master/lib/origen/registers.rb#L133
+
+It contains a number of additional methods over and above the basic ones mentioned above. This is to handle a few common methods that are called on the register internally by Origen and to stop it instantiating the full register if the request can be fulfilled without doing so. Similar methods may or may not emerge for the sub-block placeholder during implementation.
+
+### File Structure
+
+The most important thing in the file structure is that the registers for each sub-block are in different files and that those files must only be required when their sub-block is instantiated.
+It is also recommended that nested sub-blocks should be split into different files, ultimately with the goal that when an application calls something like `dut.sub_block1.sub_block2.some_register`, then the minimum possible sub-blocks and registers are instantiated to keep things snappy.
+
+It must not be assumed that you are importing into the top-level DUT, a sub-model could equally be importing model data. Therefore the code must be designed that all references are relative to the importing object.
+
+Here is a proposed structure, though the implementer has latitude to deviate if required:
+
+```ruby
+# vendor/lib/my_app/models/device_1_from_xml.rb
+module MyApp
+  module Device1FromXML
+    def self.extended(model)
+      # Pins, can be instantiated normally, don't believe that a few thousand pins will slow things down much
+      # though we an address that later if required
+      model.add_pin :pin_a
+      model.add_pin :pin_b
+      
+      # This will be creating a placeholder, not the final instantiation, and we can make the placeholder keep a note
+      # of the file that the sub-block definition lives in so that we can hold off requiring it right now
+      model.sub_block :some_block,
+                      file: "my_app/models/device_1_from_xml/some_block" # vendor/lib is automatically in the load path
+
+      model.sub_block :some_other_block, file: "my_app/models/device_1_from_xml/some_other_block"
+    end
+  end
+end
+
+# vendor/lib/my_app/models/device_1_from_xml/some_block.rb
+module MyApp
+  module Device1FromXML
+    module SomeBlock
+      def self.extended(model)
+        model.add_reg :int, 0x10, size: 16, reset: 0x0, description: 'Interrupt Register' do |reg|
+          reg.bit , :en, access: :rw, description: 'Interrupt Register'
+          reg.bit , :mode, access: :rw, description: 'Interrupt Register'
+        end
+        
+        # Additional registers and sub-block definitions as required...
+      end
+    end
+  end
+end
+
+# Example of the materialize method in the sub-block placeholder
+def materialize
+  # Create the sub_block unless it already exists (e.g. from a previous import)
+  owner.sub_block @name unless owner.respond_to?(@name)
+  require @file
+  owner.send(@name).extend module_name_from_file(@file) # Returns something like MyApp::Device1FromXML::SomeBlock, Ruby will
+                                                        # automatically invoke the extended method when this is called
+end
+
+# Example of the import method added to Origen::Model, this is very simple
+def import(name)
+  require "vendor/lib/#{Origen.app.namespace}/models/#{name}"
+  extend name.camelize.constantize # Ruby will automatically invoke the self.extended method
+end
+```
 
 # Drawbacks
 
