@@ -123,15 +123,17 @@ Here is a proposed structure, though the implementer has latitude to deviate if 
 module MyApp
   module Device1FromXML
     def self.extended(model)
-      # Pins, can be instantiated normally, don't believe that a few thousand pins will slow things down much
-      # though we an address that later if required
+      # Pins, can be instantiated normally, don't believe that a few thousand pins will slow things down
+      # much though we an address that later if required
       model.add_pin :pin_a
       model.add_pin :pin_b
       
-      # This will be creating a placeholder, not the final instantiation, and we can make the placeholder keep a note
-      # of the file that the sub-block definition lives in so that we can hold off requiring it right now
+      # This will be creating a placeholder, not the final instantiation, and we can make the placeholder
+      # keep a note of the file that the sub-block definition lives in so that we can hold off requiring
+      # it right now
       model.sub_block :some_block,
-                      file: "my_app/models/device_1_from_xml/some_block" # vendor/lib is automatically in the load path
+                      file: "my_app/models/device_1_from_xml/some_block" # vendor/lib is automatically in
+                                                                         # the load path
 
       model.sub_block :some_other_block, file: "my_app/models/device_1_from_xml/some_other_block"
     end
@@ -159,8 +161,9 @@ def materialize
   # Create the sub_block unless it already exists (e.g. from a previous import)
   owner.sub_block @name unless owner.respond_to?(@name)
   require @file
-  owner.send(@name).extend module_name_from_file(@file) # Returns something like MyApp::Device1FromXML::SomeBlock, Ruby will
-                                                        # automatically invoke the extended method when this is called
+  owner.send(@name).extend module_name_from_file(@file) # e.g. returns MyApp::Device1FromXML::SomeBlock,
+                                                        # Ruby will automatically invoke the extended
+                                                        # method when this is called
 end
 
 # Example of the import method added to Origen::Model, this is very simple
