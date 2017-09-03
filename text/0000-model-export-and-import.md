@@ -38,6 +38,35 @@ resolve a number of issues that currently exist within the ecosystem:
 
 ### Top-Level API
 
+The API should be very simple, two methods called `export` and `import` will be added to `Origen::Model`,
+meaning that any Origen model object can be exported.
+
+The export method will take a single argument, which is a name.
+All exports will be saved to a default location which will be: 
+`vendor/lib/<app_namespace>/models/<name>/`.
+
+The corresponding `import` method will take the same name argument.
+
+Models will be able to call the `import` method multiple times to load model data from different sources.
+
+```ruby
+# Importers, like those provided by CrossOrigen, should build up a model from the data it is importing, it
+# would then call export on that model:
+imported_model.export('device_1_pin_data')
+
+# The application model can then call import during initialization:
+module MyApp
+  class MyDUT
+    include Origen::TopLevel
+    
+    def initialize(options = {})
+      import 'device_1_pin_data'
+      import 'device_1_registers'
+    end
+  end
+end
+```
+
 ### File Structure
 
 ### Lazy Loading Sub-blocks
