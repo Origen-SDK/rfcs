@@ -36,14 +36,43 @@ resolve a number of issues that currently exist within the ecosystem:
 
 # Detailed design
 
+### Top-Level API
+
+### File Structure
+
+### Lazy Loading Sub-blocks
+
 The mechanism for lazy loading sub-blocks will follow the same kind of approach used by registers.
 That is, whenever `sub_block` is encountered a lightweight placeholder object will be created instead, thus
 preventing the additional files describing the sub-blocks registers from being loaded.
 When an application first references this sub-block, the placeholder will trigger the loading of the
 sub-block and it will transparently transform into the final sub-block object.
-The time to load a single
+The time to load a single sub-block is relatively quick (not really perceptable) and any one pattern or flow
+will usually only interact with a small sub-set of all of the available sub-blocks/registers.
 
-The placeholder will basically contain this structure
+The placeholder will follow this structure:
+
+~~~ruby
+class SubBlockPlaceholder
+  def initialize(name, *args)
+    # The arguments provided by the application will be stored into instance variables
+    @name = name
+    @attributes = args
+  end
+  
+  # When the application tries to use this sub-block for the first time, create it
+  def method_missing(method, *args, &block)
+    materialize.send(method, *args, &block)
+  end
+  
+  # An instantiate_sub_block method will be added to Origen::Model, this will do exactly what the
+  # current sub_block definition method does, and will replace the placeholder object with the
+  # created sub_block
+  def materialize
+    owner.instantiate_sub_block(@name, @attributes)
+  end
+end  
+~~~
 
 # Drawbacks
 
