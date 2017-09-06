@@ -18,7 +18,7 @@ level device.  A test list if made up of tests, which is really just a stimulus 
 with an ID.  It is not a test pattern, a test exists prior to simulation, emulation, and first silicon.
 By iterating around the device and IP tests, test program flows, patterns, pattern lists, 
 and other tracking documents can be created.  In the end, making tests part of the model should 
-soundly anwer the question: 'Did we test it completely?' (correctness is a whole other subject). 
+soundly anwer the question: 'Did we test it completely?' (correctness is an entirely separate subject). 
 
 # Detailed design
 
