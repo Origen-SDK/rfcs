@@ -35,7 +35,7 @@ test :my_test_id, do |t|
   t.meta2       'jkjejkf'
 end
 self.tests      # => [:my_test_id]
-self.has_tests? # => false
+self.has_tests? # => true
 ~~~
 
 I see only one required argument and three defined args (:conditions, :platforms and :description), anything else
