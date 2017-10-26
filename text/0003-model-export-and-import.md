@@ -1,6 +1,6 @@
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
-- RFC PR: (leave this empty)
-- Origen Issue: (leave this empty)
+- Start Date: 2017-10-26
+- RFC PR: https://github.com/Origen-SDK/rfcs/pull/4
+- Origen Issue: N/A
 
 # Summary
 
