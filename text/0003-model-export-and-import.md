@@ -43,7 +43,7 @@ meaning that any Origen model object can be exported.
 
 The export method will take a single argument, which is a name.
 All exports will be saved to a default location which will be: 
-`vendor/lib/<app_namespace>/models/<name>/`.
+`vendor/lib/models/<app_namespace>/<name>/`.
 
 The corresponding `import` method will take the same name argument.
 
@@ -119,7 +119,7 @@ It must not be assumed that you are importing into the top-level DUT, a sub-mode
 Here is a proposed structure, though the implementer has latitude to deviate if required:
 
 ```ruby
-# vendor/lib/my_app/models/device_1_from_xml.rb
+# vendor/lib/models/my_app/device_1_from_xml.rb
 module MyApp
   module Device1FromXML
     def self.extended(model)
@@ -132,15 +132,14 @@ module MyApp
       # keep a note of the file that the sub-block definition lives in so that we can hold off requiring
       # it right now
       model.sub_block :some_block,
-                      file: "my_app/models/device_1_from_xml/some_block" # vendor/lib is automatically in
-                                                                         # the load path
+                      file: "my_app/device_1_from_xml/some_block" # relative to vendor/lib/models
 
-      model.sub_block :some_other_block, file: "my_app/models/device_1_from_xml/some_other_block"
+      model.sub_block :some_other_block, file: "my_app/device_1_from_xml/some_other_block"
     end
   end
 end
 
-# vendor/lib/my_app/models/device_1_from_xml/some_block.rb
+# vendor/lib/models/my_app/device_1_from_xml/some_block.rb
 module MyApp
   module Device1FromXML
     module SomeBlock
@@ -168,7 +167,7 @@ end
 
 # Example of the import method added to Origen::Model, this is very simple
 def import(name)
-  require "vendor/lib/#{Origen.app.namespace}/models/#{name}"
+  require "vendor/lib/models/#{Origen.app.namespace}/#{name}"
   extend name.camelize.constantize # Ruby will automatically invoke the self.extended method
 end
 ```
