@@ -1,6 +1,6 @@
 - Start Date: 2017-06-09
-- RFC PR: (leave this empty)
-- Origen Issue: (leave this empty)
+- RFC PR: https://github.com/Origen-SDK/rfcs/pull/3
+- Implementation PR: https://github.com/Origen-SDK/origen_testers/pull/72
 
 # Summary
 
