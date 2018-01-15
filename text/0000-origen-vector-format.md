@@ -11,13 +11,15 @@ Defines an Origen-specific pattern vector format, similar in principle to
 
 A couple of use cases have emerged recently where it has been necessary to save
 the output of an Origen pattern generation operation into a some file-based format and
-then to re-play it again later:
+then re-play it again later:
 
 * The simulation capture and replay feature being added to OrigenSim requires
   an offline way of storing pin data sequences. See
   [this PR](https://github.com/Origen-SDK/origen_sim/pull/6) for details.
 * An application that relies on Windows-based 3rd party tools to generate patterns,
-  wanted to transfer the generated patterns to a Linux environment for simulation.
+  wanted to transfer the generated patterns to a Linux environment for simulation. The
+  pattern could not be fully generated in the Linux environment due to missing the Windows
+  dependencies, so it needs to be generated in Windows and the 're-played' on Linux.
 
 # Detailed design
 
@@ -43,7 +45,8 @@ The simplest vector is this, which means do 1 cycle (x3):
 Lines are terminated by an end of line, and the number of cycles is always the last
 thing in the line.
 
-Repeats are as you would expect, this is equivalent to the above:
+Repeats are as you would expect, this is equivalent to the above and there is no limit on
+the repeat size:
 
 ~~~
 3
@@ -58,7 +61,7 @@ Pin state changes have the following record format: [pin_id, operation, \*args]
 
 Each line can have multiple pin operations before the cycle, separate by a semi-colon.
 
-Here to drive the TDI pin before doing 3 cycles:
+Here to drive the TDI pin to 1 before waiting 3 cycles:
 
 ~~~
 tdi,drive,b1;3
@@ -86,15 +89,27 @@ reset,drive,b0;1
 
 The end of the pattern is simply indicated by the end of the file.
 
+The above is perhaps not as human-readable as a nicely aligned conventional vector file,
+but it's not too bad and real life examples are likely to be more repetive which would
+make them easier to scan by eye.
 
+Primarily, this format is chosen because it is easy to consume and generate with Origen,
+and it is resilient to changes in the underlying application structure - e.g. to remove some
+unused pins from the output.
 
+A parser/consumer for this can be as easy as:
 
-
-
-
-
-
-
+~~~ruby
+File.open("my_pattern.org", "r") do |f|
+  f.each_line do |line|
+    *operations, cycles = *(line.split(';'))
+    operations.each do |pin_id, operation, data|
+      dut.pin(pin_id).send(operation, Origen::Value.new(data))
+      cycles.to_i.cycles
+    end
+  end
+end
+~~~
 
 # Drawbacks
 
