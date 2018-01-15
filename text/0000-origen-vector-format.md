@@ -91,7 +91,7 @@ The end of the pattern is simply indicated by the end of the file.
 
 The above is perhaps not as human-readable as a nicely aligned conventional vector file,
 but it's not too bad and real life examples are likely to be more repetive which would
-make them easier to scan by eye.
+make them easier to scan by eye. e.g. see [this example](https://github.com/Origen-SDK/origen_sim/blob/4788459f695e5f26ada6e85f8dd6fba80a8780d0/pattern/sim_capture/default/cmd55.org)
 
 Primarily, this format is chosen because it is easy to consume and generate with Origen,
 and it is resilient to changes in the underlying application structure - e.g. to remove some
