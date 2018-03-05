@@ -168,7 +168,6 @@ Future iterations of this might introduce some Origen APIs to allow the user to 
 
 # Unresolved questions
 
-Need to work out exactly how the 
+Need to work out exactly how the code should be structured to enable the switch from vector pattern to PA pattern to be made easily by the user in order to debug a particular test. Dynamically calling functions as a variable name is generally not supported by compiled languages, so it is unlikely to work as easily as in the example above.
 
 Origen should pick up most of the heavy lifting to generate the required read_register and write_register patterns, ideally doing it without the user having to do anything. Exactly how is TBD.
-
