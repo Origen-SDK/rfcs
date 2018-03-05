@@ -132,10 +132,30 @@ if (PA_DEBUG) {
 
 ### Origen Std Lib
 
-The [Origen Standard Library](https://github.com/Origen-SDK/origen_std_lib) is going to pick up most of the heavy lifting for this and will be undergoing some significant development.
+The [Origen Standard Library](https://github.com/Origen-SDK/origen_std_lib) is going to pick up most of the heavy lifting and will be undergoing some significant development to enable this.
 
+It is expected to provide the following:
 
+* Test instance / method implementations for all of the basic test types, e.g. functional, dc measurement, freq measurement. These will have the PA debug option built in
+* The APIs required to implement the PA pattern functions. This is read/write_register, wait, pin state assertions and drives, and generally everything supported by Origen's pattern API, e.g. match waits, etc.
 
+### Read / Write Register Implementation
+
+Users wishing to use this feature will need to generate two additional vector patterns from their application, read_register and write_register, which as the name suggests will each contain a single register read and write transaction respectively.
+
+The read_register pattern should have overlay markers on the address bits and capture markers on the read data. The write_register pattern should have overlay markers on both the address and data vectors.
+
+The PA APIs can then easily create the associated read and write functions very easily by overlaying into these patterns.
+
+The real beauty in this approach is that all of the protocol information is encapsulated back at the Origen pattern source level. The new OrigenStdLib APIs don't need to understand the underlying protocol at all, they simply overlay and capture from the regular vector patterns which have been marked up by the Origen patgen. This means that this PA debug feature will instantly support any and all protocols supported by Origen.
+
+### Origen Link
+
+Astute readers will note that when the OrigenStdLib PA APIs are available on the tester, it will provide everything needed to make the tester a fully compliant [OrigenLink](http://origen-sdk.org/OrigenLink/) target.
+
+All that is required then is to implement the necessary TPC client to connect to the Origen application process, and you will be able to actually step through and debug at the true Origen source level if you want to.
+
+While not specifically part of this RFC, it is important that we ensure the route we take here is compatible with this vision and the required OrigenLink addon will likely follow not too long after this is implemented.
 
 # Drawbacks
 
@@ -150,4 +170,5 @@ Future iterations of this might introduce some Origen APIs to allow the user to 
 
 Need to work out exactly how the 
 
+Origen should pick up most of the heavy lifting to generate the required read_register and write_register patterns, ideally doing it without the user having to do anything. Exactly how is TBD.
 
