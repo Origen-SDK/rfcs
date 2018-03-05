@@ -4,7 +4,7 @@
 
 # Summary
 
-Origen currently produces vector-level ATE patterns; when debugging silicon using these patterns, the user
+Origen currently produces vector-level ATE patterns. When debugging silicon using these patterns, the user
 must  decipher fails at the vector-level and make vector edits if they want to change the pattern behavior.
 This RFC describes how to provide the user with register-level debug functionality (and in a way that they can get for
 free from Origen), while still producing efficient vector-level patterns for production.
@@ -27,33 +27,95 @@ thought about how Origen can make use of these features over the past few years,
 Reasons for this include:
 
 * For whatever reason, they just seem to be very complicated to use and not very accessible. Generally, the Origen way is to use simpler ATE features where possible since the code is easier for engineers to understand and maintain. For example, rather than complicated PA APIs, this RFC is implemented by vector overlay/capture which is much more widely understood.
-* It would be hard to automatically convert an Origen protocol implementation into a native ATE one. Meaning that there would be a lot of work to re-implement these protocols in the ATE language, and potentially then repeat that for all supported platforms.
+* It would be hard to automatically convert an Origen protocol implementation into a native ATE one. Meaning that there would be a lot of work to re-implement the available Origen protocols in the ATE language, and potentially then repeat that for all supported platforms.
 * Some PA implementations are actually not even all that good for debug, for example they don't allow you to single step through the code at runtime. The attraction of such a system must therefore be that it provides you with a way to natively write your patterns at transaction level in the first place, but that's no advantage at all if you are using Origen.
 * The PA APIs can cost additional license fees to enable.
 * Real patterns are more than just protocol transactions, e.g. often involving some direct pin interaction in-between transactions, so at best the official PA approach may only be a partial solution anyway.
+* Most examples of PA seem to focus on the physical protocol, for example JTAG. While a step-up for vector-level, most engineers don't think in JTAG and they would still have mental translation to align to the register-level that they think in. While it is no doubt possible to create true register-level protocols using native PA APIs, examples of this seem to be few and far between.
 
 # Detailed design
 
+Given the following example Origen pattern code:
+
+~~~ruby
+# Source for my_pat
+
+ss "Launch some command"
+my_reg.write!(0x1234_5678)
+
+ss "Verify that the command has completed and passed"
+tester.wait time_in_us: 10
+
+dut.pin(:done).assert!(1)
+dut.pin(:done).dont_care
+
+my_reg2.fail.read!(0)
+~~~
+
+We will continue to generate a vector-level representation exactly the same as we have it today. e.g.
+
+~~~
+// ###############################################################
+// # Launch some command
+// ###############################################################
+repeat 6                                                         > tp0                          0 X X 1 ;
+repeat 2                                                         > tp0                          0 X X 0 ;
+repeat 2                                                         > tp0                          0 X X 1 ;
+repeat 2                                                         > tp0                          0 X X 0 ;
+// [JTAG] Write IR: 0xB
+repeat 2                                                         > tp0                          0 1 X 0 ;
+                                                                 > tp0                          0 0 X 0 ;
+                                                                 > tp0                          0 1 X 1 ;
+// [JTAG] /Write IR: 0xB
+                                                                 > tp0                          0 1 X 1 ;
+                                                                 > tp0                          0 1 X 0 ;
+                                                                 > tp0                          0 1 X 1 ;
+repeat 2                                                         > tp0                          0 1 X 0 ;
+// [JTAG] Write DR: 0x1
+                                                                 > tp0                          0 1 X 0 ;
+repeat 33                                                        > tp0                          0 0 X 0 ;
+                                                                 > tp0                          0 0 X 1 ;
+// [JTAG] /Write DR: 0x1
+
+//....
+~~~
+
+Additionally, most (all?) tester drivers will support a switch to enable PA debugging, initially this will be developed for
+V93K (SMT8) and UltraFLEX.
+When this switch is enabled in the target environment:
+
+~~~ruby
+OrigenTesters::V93K.new pa_debugging: true
+~~~
+
+then Origen will generate both the regular vector pattern and also a PA version. This PA version will be in the form of a VB/Java/C++ function, something like this (read this as pseudo-code, not sure if it is valid VB, Java, or C++!):
+
+~~~c
+// Function name will match the pattern name
+function my_pat() {
+  // ###############################################################
+  // # Launch some command
+  // ###############################################################
+  origen.write_register(0x1000_0000, 0x1234_5678);  // my_reg  (we will at least generate comments like this, if not a full register table)
+  
+  // Wait for 10 us
+  origen.cycle(1000);
+  
+  origen.assert_pin("done", 1);
+  origen.set_pin_state("done", "x");
+
+  origen.read_register(0x1000_0200, 0x0000_0000, 0x0000_0080);  // my_reg2  (last arg is a compare mask)
+}
+~~~
 
 
 
 
-
-This is the bulk of the RFC. Explain the design in enough detail for somebody
-familiar with the framework to understand, and for somebody familiar with the
-implementation to implement. This should get into specifics and corner-cases,
-and include examples of how the feature is used. Any new terminology should be
-defined here.
 
 # Drawbacks
 
-Why should we *not* do this? Please consider the impact on teaching Origen,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
 
-There are tradeoffs to choosing any path, please attempt to identify them here.
 
 # Unresolved questions
 
-Optional, but suggested for first drafts. What parts of the design are still
-TBD?
+
