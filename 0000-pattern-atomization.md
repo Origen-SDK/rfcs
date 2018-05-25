@@ -67,20 +67,20 @@ Will need to update the register model to handle the dirty/clean concept.
 i.e. you would write to register normally, then when you wanted to freeze it you would save the clean state
 
 ~~~ruby
-	reg.save_clean
+reg.save_clean
 ~~~
 
 Then subsequent writes would 'dirty' the register. 
 
 ~~~ruby
-	reg.write(data) # doesn't matter if writing out to pattern or not, the register has been dirtied in origen
+reg.write(data) # doesn't matter if writing out to pattern or not, the register has been dirtied in origen
 ~~~
 
 Then when you wanted to restore the 'clean' state you'd do:
 
 ~~~ruby
-	reg.clean  # only in origen
-	reg.clean! # in origen and out to test stimulus (pattern)
+reg.clean  # only in origen
+reg.clean! # in origen and out to test stimulus (pattern)
 ~~~
 
 And this would restore clean register state again.
@@ -88,38 +88,49 @@ And this would restore clean register state again.
 If you had a dirty register and wanted to update the clean state again, just run 'save_clean' again
 
 ~~~ruby
-	reg.save_clean
+reg.save_clean
 ~~~
-	
+
 If you wanted to clear the clean data back to reset state, without resetting the current state of the register (why don't know)...
  
 ~~~ruby
-	reg.reset_clean
+reg.reset_clean
 ~~~
-	
+
 Basically now every register has 2 bit collections associated with it-- a clean/save state and a currently active state.
 
 Each bit collection has the same features as previous register model, i.e. :
 
 ~~~ruby
-	reg.bit.store_clean
-	reg.bit.reset_clean
-	reg.bits.overlay_clean
+reg.bit.store_clean
+reg.bit.reset_clean
+reg.bits.overlay_clean
 ~~~
-	
+
 Etc.
 
 Actually every bit field would have to have clean/dirty state on it and a backup value to store if dirtied.
 
 # Drawbacks
 
-Why should we *not* do this? Please consider the impact on teaching Origen,
-on the integration of this feature with other existing and planned features,
-on the impact of the API churn on existing apps, etc.
+Depending on how it is implemented, updating Origen to support this feature may add complexity and slow down how the register
+register model operates. By design any updates to the register model has to be backwards compatible.
 
-There are tradeoffs to choosing any path, please attempt to identify them here.
+This atomization feature could be handled at the application level, but given that it is likely something desired by many
+users it makes sense to include some support in Origen itself to handle.
+
+
+### Implementation
+
+The underlying register model need not be modified.  Since the goal is to have essentially 2 copies of every register so that each
+and every feature has a normal and a 'clean' version, a simple implementation could be simply having a seprate register collection
+object that represents all clean registers, a mirror of the main register model. But from the user POV it would seem all part of the
+same register.
+
+The goal would be to minimize performance impact to users who choose not to use this feature, and only have a minimal perforance
+hit for users that do.
 
 # Unresolved questions
 
-Optional, but suggested for first drafts. What parts of the design are still
-TBD?
+- How is the 'clean' state different than the 'reset' state? 
+- How to handle cases where the 'clean' state is determined dynamically via an overlay?
