@@ -66,34 +66,46 @@ This will keep track of whether a register is dirtied or not.
 Will need to update the register model to handle the dirty/clean concept. 
 i.e. you would write to register normally, then when you wanted to freeze it you would save the clean state
 
+~~~ruby
 	reg.save_clean
+~~~
 
 Then subsequent writes would 'dirty' the register. 
 
-	reg.write(data) <-- doesn't matter if writing out to pattern or not, the register has been dirtied in origen
+~~~ruby
+	reg.write(data) # doesn't matter if writing out to pattern or not, the register has been dirtied in origen
+~~~
 
 Then when you wanted to restore the 'clean' state you'd do:
 
-	reg.clean <-- only in origen
-	reg.clean! <-- in origen and out to test stimulus (pattern)
+~~~ruby
+	reg.clean  # only in origen
+	reg.clean! # in origen and out to test stimulus (pattern)
+~~~
 
 And this would restore clean register state again.
 
 If you had a dirty register and wanted to update the clean state again, just run 'save_clean' again
 
+~~~ruby
 	reg.save_clean
+~~~
 	
 If you wanted to clear the clean data back to reset state, without resetting the current state of the register (why don't know)...
  
+~~~ruby
 	reg.reset_clean
+~~~
 	
 Basically now every register has 2 bit collections associated with it-- a clean/save state and a currently active state.
 
 Each bit collection has the same features as previous register model, i.e. :
 
+~~~ruby
 	reg.bit.store_clean
 	reg.bit.reset_clean
 	reg.bits.overlay_clean
+~~~
 	
 Etc.
 
