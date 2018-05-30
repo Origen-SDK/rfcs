@@ -59,18 +59,19 @@ atomize(options) do |atom|
 end
 ~~~
 
-which will key off of `$soc.atomize?` and `$tester` to determine whether to actually implement the atomic pattern splitting or not.
+which could be keyed off of `dut.atomize?` or `tester` to determine whether to actually implement the atomic pattern splitting or not.
 
 
-This will keep track of whether a register is dirtied or not.
-Will need to update the register model to handle the dirty/clean concept. 
-i.e. you would write to register normally, then when you wanted to freeze it you would save the clean state
+Origen will then keep track of whether a register is dirtied or not.
+
+The register model will need to be updated to handle the dirty/clean concept. 
+i.e. you would write to register normally, then when you wanted to freeze it you would save the clean state:
 
 ~~~ruby
 reg.save_clean
 ~~~
 
-Then subsequent writes would 'dirty' the register. 
+Then subsequent writes would 'dirty' the register: 
 
 ~~~ruby
 reg.write(data) # doesn't matter if writing out to pattern or not, the register has been dirtied in origen
@@ -85,13 +86,13 @@ reg.clean! # in origen and out to test stimulus (pattern)
 
 And this would restore clean register state again.
 
-If you had a dirty register and wanted to update the clean state again, just run 'save_clean' again
+If you had a dirty register and wanted to update the clean state again, just run 'save_clean' again:
 
 ~~~ruby
 reg.save_clean
 ~~~
 
-If you wanted to clear the clean data back to reset state, without resetting the current state of the register (why don't know)...
+If you wanted to clear the clean data back to reset state, without resetting the current state of the register (why don't know):
  
 ~~~ruby
 reg.reset_clean
@@ -132,5 +133,11 @@ hit for users that do.
 
 # Unresolved questions
 
-- How is the 'clean' state different than the 'reset' state? 
+- How is the 'clean' state different than the 'reset' state?
+
+  They are similar.  'Reset' could imply more the state of the register
+when reset it pulled (and could be changed to reflect changes in NVM that might impact the reset state).  'Clean' could imply 
+more a state where we like the current value of the register for general operation, but understand that there may need
+to be a temporary modification for a particular special operation.
+
 - How to handle cases where the 'clean' state is determined dynamically via an overlay?
