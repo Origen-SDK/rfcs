@@ -153,11 +153,11 @@ Otherwise, they will be required in exactly the same way and their internal Ruby
 structure will be the same as before.
 
 It would perhaps have been nice to drop 'my_app' from the path and namespace when moving to the
-new structure, however that some significant downsides:
+new structure, however that would come with some significant downsides:
 
 * It would almost certainly mean that Origen would have to hi-jack and override Ruby's `require`
   and `load` functions. There are probably a lot of corner cases to worry about from doing that and
-  it seems to risky, at least in combination with the other changes being discussed here.
+  it seems too risky, at least in combination with the other changes being discussed here.
 * Renaming of class names and directory structure could break applications if plugins converted
   over to the new structure and changed some of the naming. Therefore it is better to go with a system
   like this which is purely a code organizational change, rather than a logical one.
