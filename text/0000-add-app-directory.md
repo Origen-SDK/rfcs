@@ -176,10 +176,38 @@ In contrast to the models and controllers which get loaded by Ruby, these direct
 not be added to Ruby's LOAD_PATH and instead will be loaded by Origen as part of the target
 loading process.
 
-These files will not be architected as Ruby classes or modules, instead they will 
+These files will not be architected as Ruby classes or modules, instead they will be written in terms
+of adding to the current DUT, this is best shown by example.
 
+A timing file will look something like this:
 
+~~~ruby
+# app/timing/application.rb
 
+dut.timeset :func do |t|
+  t.wave :tck do |w|
+    w.drive 0, at: 0
+    w.drive :data, at: 50
+  end
+end
+~~~
+
+For all of these types of resources the convention will be to load a file called `application.rb`
+first, this will be considered global, then it will look for a file named after the current target.
+So the contents of these directories will look something like this:
+
+~~~text
+.
+└── app/               
+    └── timing/
+         ├── application.rb 
+         ├── dut1.rb
+         └── dut2.rb
+~~~
+
+By default, Origen will only automatically load files like this for the current application.
+
+If a plugin wishes to provide
 
 ### Adding Generators
 
