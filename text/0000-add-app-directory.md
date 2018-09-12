@@ -82,7 +82,7 @@ the existing top-level `lib/` dir and code would be loaded/required from it in t
 way - i.e. just give a relative reference like `require 'my_app/my_file'` and it will be loaded
 regardless of whether it is in `lib/` or `app/lib`.
 
-'app/models' and 'app/controllers' will also be handled much the same, they will essentially
+`app/models` and `app/controllers` will also be handled much the same, they will essentially
 just be aliases for 'app/lib' but using these will help to organize the code a bit more clearly.
 
 So far, conventions (from documentation and examples in the wild) have encouraged users to
