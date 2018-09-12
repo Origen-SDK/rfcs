@@ -235,6 +235,12 @@ or, they can advise their user's how to do it from their application:
 Origen.app(:my_plugin).load_definitions  # note the app name means this refers to the plugin's defintiions
 ~~~
 
+In fact, I propose that the automatic loading of resources is only done for top-level applications. If the current
+application is a plugin within its own development workspace, then the application code will still have to do the loading.
+This will
+ensure that it works the same way standalone and as a plugin, which should avoid any un-necessary surprises when it is
+added to an application.
+
 ### Adding Generators
 
 Origen has actually contained a code generation API for some time (heavily ripped-off from
