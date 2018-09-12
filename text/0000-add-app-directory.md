@@ -62,8 +62,8 @@ the app itself (i.e. the bulk of the code the user's will write) is now in the a
 
 ### Backwards Compatibility
 
-This change will be implemented to be fully backwards compatible, 
-
+This change will be implemented to be fully backwards compatible, the orginal directories will
+continue to be supported in parallel and with no plans to phase out support for them.
 
 ### How Will Code be Loaded
 
