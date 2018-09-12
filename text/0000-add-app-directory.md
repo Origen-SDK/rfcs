@@ -207,18 +207,56 @@ So the contents of these directories will look something like this:
 
 By default, Origen will only automatically load files like this for the current application.
 
-If a plugin wishes to provide
+If a plugin wishes to provide resources like this to an application, then a mechanism needs to be
+available to load those too. It is proposed to add a method on the application instance to do this:
+
+~~~ruby
+Origen.app.load_definitions
+~~~
+
+Which by default would load only the `application.rb` files, then you can supply a target name (though
+in reality it is just a name and doesn't need to correspond to a target), and optionally decide
+to only load a subset:
+
+~~~ruby
+Origen.app.load_definitions :my_defs, only: [:timing, :levels]
+~~~
+
+Having such an API means that plugins can take care of loading this themselves, e.g. during their
+model `initialize` method:
+
+~~~ruby
+Origen.app!.load_definitions :my_defs    # note the use of app!
+~~~
+
+or, they can advise their user's how to do it from their application:
+
+~~~ruby
+Origen.app(:my_plugin).load_definitions  # note the app name means this refers to the plugin's defintiions
+~~~
 
 ### Adding Generators
 
 Origen has actually contained a code generation API for some time (heavily ripped-off from
-Ruby on Rails), however it has not been documented and has only really been used 
+Ruby on Rails), however it has not been documented and has only really been used with `origen_app_generators`.
+
+As part of this change it is proposed to enable the `origen new` command within application workspaces for
+the purpose of generating new resources. e.g.
+
+~~~text
+origen new model blah    # Will generate a stub for the given model and a controller for it
+
+origen new timing blah
+~~~
 
 ### Steps Involved in Implementing This
 
 * Update Origen core (maybe some impact on OrigenTesters too) to make it look for code in the
-  new locations in addition to the existing ones
-
+  new locations in addition to the existing ones.
+* Add the `load_definitions` method and integrate into the target loading process.
+* Update Origen App Generators to create new apps that follow these new conventions.
+* Add the 'origen new' resource generator command.
+* Document it all.
 
 # Drawbacks
 
